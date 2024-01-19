@@ -6,3 +6,12 @@
 
 # STAR --runThreadN 4 --runMode genomeGenerate --genomeDir <outdir> \
 # --genomeFastaFiles <genomefile> --genomeSAindexNbases 9
+
+
+#Argumentos
+genome_file=$1
+output_directory=$2
+
+#comando STAR para indexar
+STAR --runThreadN 4 --runMode genomeGenerate --genomeDir "$output_directory" \
+ --genomeFastaFiles "$genome_file" --genomeSAindexNbases 9
