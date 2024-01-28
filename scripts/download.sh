@@ -23,7 +23,7 @@
 
 # Verifica si se proporciona el número correcto de argumentos
 if [ "$#" -lt 2 ]; then
-    echo "Uso: $0 <url_del_archivo> <directorio_salida> [descomprimir: si/no] [palabra_de_filtro]"
+    echo "Uso: $0 <url_del_archivo> <directorio_salida> [descomprimir: yes/no] [palabra_de_filtrado]"
     exit 1
 fi
 
@@ -49,9 +49,13 @@ wget -O "$output_directory/$filename" "$file_url"
 if [ "$uncompress" == "yes" ]; then
     gunzip -k "$output_directory/$filename"
     filename="${filename%.gz}"  # Actualiza el nombre del archivo sin la extensión .gz
+    echo "El archivo ha sido descomprimido"
 else
     echo "No se ha descomprimido el archivo"
 fi
+
+#Vamos a verificar si el archivo descomprimido existe antes de continuar para evitar errores
+if [ -e "$output_directory/$filename" ]; then
 
 # Filtra las secuencias basadas en la palabra especificada
 #if [ -n "$filter_word" ]; then
@@ -60,32 +64,37 @@ fi
 #   echo "No se han proporcionado condiciones para el filtrado"
 #fi
 
-if [ ! -z "$keyword" ]; then
-    awk -v keyword="$keyword" '
-	/^>/ {			#Mira que la linea empiece por > (comentario)
-		if (seq_count > 0) {    #Mira si hay secuencias acumuladas
-			print seq_header;
-                	print seq_content #Imprime el encabezado de la secuencia
-		}
-		seq_count=0 		#Reinicia el contador de secuencias
-		seq_header=$0		#Almacena el encabezado de la nueva secuencia
-		next			#Salta al siguiente ciclo sin procesar mas abajo
-	}
-	{
+	if [ ! -z "$keyword" ]; then
+    		awk -v keyword="$keyword" '
+			/^>/ {			#Mira que la linea empiece por > (comentario)
+				if (seq_count > 0) {    #Mira si hay secuencias acumuladas
+					print seq_header;
+                			print seq_content #Imprime el encabezado de la secuencia
+				}
+				seq_count=0 		#Reinicia el contador de secuencias
+				seq_header=$0		#Almacena el encabezado de la nueva secuencia
+				next			#Salta al siguiente ciclo sin procesar mas abajo
+			}
+			{
 
-		if(!match($0, keyword)) { #Si la linea no contiene la palabra clave
-			seq_content = seq_content $0 #Agrega la linea al contenido de  la secuencia
-			seq_count++	#Incrementa el contador de  secuencias
-		}
-	}
-	END { 			#Al llegar al final del archivo
-		if (seq_count > 0) { #Si hay seceuncias acumuladas
-			print seq_header; #Imprime el encabezado de la ultima secuencia
-			print seq_content #Imprime el contenido de la ultima seceuncia
-	    }
-	}
-' "$output_directory/$filename" > "$output_directory/filtered_$filename "
-
+				if(!match($0, keyword)) { #Si la linea no contiene la palabra clave
+					seq_content = seq_content $0 #Agrega la linea al contenido de  la secuencia
+					seq_count++	#Incrementa el contador de  secuencias
+				}
+			}
+			END { 			#Al llegar al final del archivo
+				if (seq_count > 0) { #Si hay seceuncias acumuladas
+					print seq_header; #Imprime el encabezado de la ultima secuencia
+					print seq_content #Imprime el contenido de la ultima seceuncia
+	    			}
+			}
+		' "$output_directory/$filename" > "$output_directory/filtered_$filename "
+		echo "Se han filtrado las secuencias que contienen la palabra clave $keyword"
+    	else
+		echo "No se han proporcionado condiciones para el filtrado"
+	fi
+else
+	echo "Error: El archivo descomprimido no existe. Verifica posibles fallos en la descompresion"
 fi
 
 echo "Proceso completado sin fallos"
