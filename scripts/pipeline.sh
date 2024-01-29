@@ -87,11 +87,11 @@ done
 
 
 echo -e "\nSTAR Logs:" >> "$log_file"
-for log in out/star/*/*.Log.final.out
+for log in out/star/*/*Log.final.out
 do
     sid=$(basename "$(dirname "$log")")
     echo -e "\nSample: $sid" >> "$log_file"
-    grep -E "Uniquely mapped reads|% of reads mapped to multiple loci|% of reads mapped to too many loci" "$log" >> "$log_file" 2>/dev/null || true
+    grep -E "Uniquely mapped reads %|% of reads mapped to multiple loci|% of reads mapped to too many loci" "$log" >> "$log_file" 2>/dev/null || true
 done
 
 echo "Pipeline completed successfully. Log file: $log_file"
