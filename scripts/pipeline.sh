@@ -7,9 +7,12 @@
 #done
 
 # Vamos a intentar descargar los ficheros de esta forma
-while IFS= read -r url; do
-    bash scripts/download.sh "$url" data
-done < data/urls
+#while IFS= read -r url; do
+#    bash scripts/download.sh "$url" data
+#done < data/urls
+
+#Sustituimos el bucle while para descargar por una linea con wget
+wget -i data/urls -P data
 
 
 # Descargamos el archivo de fasta de contaminaciones, descomprimimos y filtramos para quitar los small nuclear RNAs
