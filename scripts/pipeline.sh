@@ -1,11 +1,4 @@
 
-# Vamos a descargar todos los ficheros de  data/filenames
-# Con esta forma de hacerlo se lia con los espacios
-#for url in $(data/urls) #TODO
-#do
-#    bash scripts/download.sh $url data
-#done
-
 # Vamos a intentar descargar los ficheros de esta forma
 #while IFS= read -r url; do
 #    bash scripts/download.sh "$url" data
@@ -38,8 +31,6 @@ done
 
 
 # TODO: run cutadapt for all merged files
-# cutadapt -m 18 -a TGGAATTCTCGGGTGCCAAGG --discard-untrimmed \
-#     -o <trimmed_file> <input_file> > <log_file>
 mkdir -p out/trimmed
 mkdir -p log/cutadapt
 for input_file in out/merged/*.fastq.gz

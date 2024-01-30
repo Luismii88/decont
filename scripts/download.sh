@@ -1,24 +1,3 @@
-# This script should download the file specified in the first argument ($1),
-# place it in the directory specified in the second argument ($2),
-# and *optionally*:
-# - uncompress the downloaded file with gunzip if the third
-#   argument ($3) contains the word "yes"
-# - filter the sequences based on a word contained in their header lines:
-#   sequences containing the specified word in their header should be **excluded**
-#
-# Example of the desired filtering:
-#
-#   > this is my sequence
-#   CACTATGGGAGGACATTATAC
-#   > this is my second sequence
-#   CACTATGGGAGGGAGAGGAGA
-#   > this is another sequence
-#   CCAGGATTTACAGACTTTAAA
-#
-#   If $4 == "another" only the **first two sequence** should be output
-
-
-
 
 
 # Verifica si se proporciona el número correcto de argumentos
@@ -36,7 +15,8 @@ keyword=$4
 # Crea el directorio de salida si no existe
 #con el -p hacemos que los directorios intermedios que no existan se creen
 #utilizo el $ para que el directorio se llame como el contenido de esa variable
-# Estoy añadiendo esto al codigo: if [ ! -d "$output_directory" ]; then (con ello comprobamos si esta o no creado el directorio
+# Con el if comprobamos si esta o no creado el directorio
+
 if [ ! -d "$output_directory" ]; then
 	mkdir -p "$output_directory"
 fi
@@ -63,7 +43,7 @@ if [ -e "$output_directory/$filename" ]; then
 # Filtra las secuencias basadas en la palabra especificada
 
 	if [ ! -z "$keyword" ]; then
-# Filtrar y eliminar secuencias de snRNA con seqkit
+# Filtrar y eliminar por palabra con seqkit
         seqkit grep -v -n -r -p "$keyword" "$output_directory/$filename" > "$output_directory/${filename%.*}_filtered.fasta"
 
 		echo "Se han filtrado las secuencias que contienen la palabra clave $keyword"
