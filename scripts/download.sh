@@ -36,7 +36,10 @@ keyword=$4
 # Crea el directorio de salida si no existe
 #con el -p hacemos que los directorios intermedios que no existan se creen
 #utilizo el $ para que el directorio se llame como el contenido de esa variable
-mkdir -p "$output_directory"
+# Estoy añadiendo esto al codigo: if [ ! -d "$output_directory" ]; then (con ello comprobamos si esta o no creado el directorio
+if [ ! -d "$output_directory" ]; then
+	mkdir -p "$output_directory"
+fi
 
 # Extrae el nombre del archivo de la URL (sin el directorio)
 filename=$(basename "$file_url")
@@ -58,37 +61,11 @@ fi
 if [ -e "$output_directory/$filename" ]; then
 
 # Filtra las secuencias basadas en la palabra especificada
-#if [ -n "$filter_word" ]; then
-#    grep -B 1 -v "$filter_word" "$output_directory/$filename" > "$output_directory/filtered_file"
-#else
-#   echo "No se han proporcionado condiciones para el filtrado"
-#fi
 
 	if [ ! -z "$keyword" ]; then
-    		awk -v keyword="$keyword" '
-			/^>/ {			#Mira que la linea empiece por > (comentario)
-				if (seq_count > 0) {    #Mira si hay secuencias acumuladas
-					print seq_header;
-                			print seq_content #Imprime el encabezado de la secuencia
-				}
-				seq_count=0 		#Reinicia el contador de secuencias
-				seq_header=$0		#Almacena el encabezado de la nueva secuencia
-				next			#Salta al siguiente ciclo sin procesar mas abajo
-			}
-			{
+# Filtrar y eliminar secuencias de snRNA con seqkit
+        seqkit grep -v -n -r -p "$keyword" "$output_directory/$filename" > "$output_directory/${filename%.*}_filtered.fasta"
 
-				if(!match($0, keyword)) { #Si la linea no contiene la palabra clave
-					seq_content = seq_content $0 #Agrega la linea al contenido de  la secuencia
-					seq_count++	#Incrementa el contador de  secuencias
-				}
-			}
-			END { 			#Al llegar al final del archivo
-				if (seq_count > 0) { #Si hay seceuncias acumuladas
-					print seq_header; #Imprime el encabezado de la ultima secuencia
-					print seq_content #Imprime el contenido de la ultima seceuncia
-	    			}
-			}
-		' "$output_directory/$filename" > "$output_directory/filtered_$filename "
 		echo "Se han filtrado las secuencias que contienen la palabra clave $keyword"
     	else
 		echo "No se han proporcionado condiciones para el filtrado"

@@ -16,7 +16,7 @@ wget -i data/urls -P data
 
 
 # Descargamos el archivo de fasta de contaminaciones, descomprimimos y filtramos para quitar los small nuclear RNAs
-bash scripts/download.sh https://bioinformatics.cnio.es/data/courses/decont/contaminants.fasta.gz res yes small_nuclear  #TODO
+bash scripts/download.sh https://bioinformatics.cnio.es/data/courses/decont/contaminants.fasta.gz res yes "small nuclear"  #TODO
 
 # Indexamos el archivo contaminants.fasta
 bash scripts/index.sh res/contaminants.fasta res/contaminants_idx
